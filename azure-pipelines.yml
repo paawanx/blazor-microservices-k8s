@@ -1,34 +1,58 @@
 trigger:
 - main
 
-pool:
-  vmImage: windows-latest
-
 variables:
   buildConfiguration: Release
 
-steps:
-# Install .NET 8 SDK
-- task: UseDotNet@2
-  inputs:
-    packageType: sdk
-    version: 10.0.x
+stages:
 
-# Restore packages
-- script: dotnet restore
-  displayName: Restore
+# =========================
+# BUILD STAGE
+# =========================
+- stage: Build
+  jobs:
+  - job: BuildJob
+    pool:
+      vmImage: windows-latest
 
-# Build
-- script: dotnet build --configuration $(buildConfiguration) --no-restore
-  displayName: Build
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: sdk
+        version: 10.0.x
 
-# Publish (creates compiled output)
-- script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
-  displayName: Publish
+    - script: dotnet restore
+      displayName: Restore
 
-# Upload artifact
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: $(Build.ArtifactStagingDirectory)
-    ArtifactName: drop
-    publishLocation: Container
+    - script: dotnet build --configuration $(buildConfiguration) --no-restore
+      displayName: Build
+
+    - script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+      displayName: Publish
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)
+        ArtifactName: drop
+
+# =========================
+# DEPLOY STAGE
+# =========================
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    pool:
+      vmImage: windows-latest
+
+    steps:
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        artifactName: drop
+        downloadPath: $(System.ArtifactsDirectory)
+
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: learnappservice
+        appName: blazorcrud-demo-app
+        package: $(System.ArtifactsDirectory)/drop
