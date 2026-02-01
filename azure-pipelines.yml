@@ -21,13 +21,13 @@ stages:
         packageType: sdk
         version: 8.0.x
 
-    - script: dotnet restore
+    - script: dotnet restore BlazorCRUD.sln
       displayName: Restore
 
-    - script: dotnet build --configuration $(buildConfiguration) --no-restore
+    - script: dotnet build BlazorCRUD.sln --configuration $(buildConfiguration) --no-restore
       displayName: Build
 
-    - script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+    - script: dotnet publish BlazorCRUD.sln --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
       displayName: Publish
 
     - task: PublishBuildArtifacts@1
