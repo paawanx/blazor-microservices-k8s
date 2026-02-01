@@ -1,5 +1,5 @@
 trigger:
-- main
+  - main
 
 variables:
   buildConfiguration: Release
@@ -7,69 +7,68 @@ variables:
   zipName: app.zip
 
 stages:
+  # =========================
+  # BUILD STAGE
+  # =========================
+  - stage: Build
+    jobs:
+      - job: BuildJob
+        pool:
+          name: Default
 
-# =========================
-# BUILD STAGE
-# =========================
-- stage: Build
-  jobs:
-  - job: BuildJob
-    pool:
-      name: Default
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: 8.0.x
 
-    steps:
-    - task: UseDotNet@2
-      inputs:
-        packageType: sdk
-        version: 8.0.x
+          # Restore
+          - script: dotnet restore BlazorCRUD/BlazorCRUD.csproj
+            displayName: Restore
 
-    # Restore
-    - script: dotnet restore BlazorCRUD.sln
-      displayName: Restore
+          # Build
+          - script: dotnet build BlazorCRUD/BlazorCRUD.csproj --configuration $(buildConfiguration) --no-restore
+            displayName: Build
 
-    # Build
-    - script: dotnet build BlazorCRUD.sln --configuration $(buildConfiguration) --no-restore
-      displayName: Build
+          # Publish
+          - script: dotnet publish BlazorCRUD/BlazorCRUD.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish
+            displayName: Publish
 
-    # Publish
-    - script: dotnet publish BlazorCRUD.sln --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish
-      displayName: Publish
+          # Zip published output
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/publish
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: $(Build.ArtifactStagingDirectory)/$(zipName)
+              replaceExistingArchive: true
 
-    # Zip published output
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.ArtifactStagingDirectory)/publish
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(zipName)
-        replaceExistingArchive: true
+          # Publish ZIP as artifact
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: $(Build.ArtifactStagingDirectory)/$(zipName)
+              ArtifactName: $(artifactName)
 
-    # Publish ZIP as artifact
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: $(Build.ArtifactStagingDirectory)/$(zipName)
-        ArtifactName: $(artifactName)
+  # =========================
+  # DEPLOY STAGE
+  # =========================
+  - stage: Deploy
+    dependsOn: Build
+    jobs:
+      - job: DeployJob
+        pool:
+          name: Default
 
-# =========================
-# DEPLOY STAGE
-# =========================
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-  - job: DeployJob
-    pool:
-      name: Default
+        steps:
+          # Download artifact
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              artifactName: $(artifactName)
+              downloadPath: $(System.ArtifactsDirectory)
 
-    steps:
-    # Download artifact
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        artifactName: $(artifactName)
-        downloadPath: $(System.ArtifactsDirectory)
-
-    # Deploy ZIP
-    - task: AzureWebApp@1
-      inputs:
-        azureSubscription: learnappservice
-        appName: LearnAppService
-        package: $(System.ArtifactsDirectory)/$(artifactName)/$(zipName)
+          # Deploy ZIP
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: learnappservice
+              appName: LearnAppService
+              package: $(System.ArtifactsDirectory)/$(artifactName)/$(zipName)
