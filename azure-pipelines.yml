@@ -3,6 +3,8 @@ trigger:
 
 variables:
   buildConfiguration: Release
+  artifactName: drop
+  zipName: app.zip
 
 stages:
 
@@ -21,19 +23,32 @@ stages:
         packageType: sdk
         version: 8.0.x
 
+    # Restore
     - script: dotnet restore BlazorCRUD.sln
       displayName: Restore
 
+    # Build
     - script: dotnet build BlazorCRUD.sln --configuration $(buildConfiguration) --no-restore
       displayName: Build
 
-    - script: dotnet publish BlazorCRUD.sln --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+    # Publish
+    - script: dotnet publish BlazorCRUD.sln --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish
       displayName: Publish
 
+    # Zip published output
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.ArtifactStagingDirectory)/publish
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(zipName)
+        replaceExistingArchive: true
+
+    # Publish ZIP as artifact
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: $(Build.ArtifactStagingDirectory)
-        ArtifactName: drop
+        PathtoPublish: $(Build.ArtifactStagingDirectory)/$(zipName)
+        ArtifactName: $(artifactName)
 
 # =========================
 # DEPLOY STAGE
@@ -46,13 +61,15 @@ stages:
       name: Default
 
     steps:
+    # Download artifact
     - task: DownloadBuildArtifacts@0
       inputs:
-        artifactName: drop
+        artifactName: $(artifactName)
         downloadPath: $(System.ArtifactsDirectory)
 
+    # Deploy ZIP
     - task: AzureWebApp@1
       inputs:
         azureSubscription: learnappservice
-        appName: blazorcrud-demo-app
-        package: $(System.ArtifactsDirectory)/drop
+        appName: LearnAppService
+        package: $(System.ArtifactsDirectory)/$(artifactName)/$(zipName)
