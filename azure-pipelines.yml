@@ -43,7 +43,7 @@ stages:
   jobs:
   - job: DeployJob
     pool:
-      vmImage: windows-latest
+      name: Default
 
     steps:
     - task: DownloadBuildArtifacts@0
