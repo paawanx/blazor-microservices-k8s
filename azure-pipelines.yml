@@ -20,7 +20,7 @@ stages:
             inputs:
               command: buildAndPush
               repository: $(imageName)
-              dockerfile: Dockerfile
+              dockerfile: dockerfile
               containerRegistry: acr-LearnAppService
               tags: |
                 $(tag)
