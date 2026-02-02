@@ -2,73 +2,42 @@ trigger:
   - main
 
 variables:
-  buildConfiguration: Release
-  artifactName: drop
-  zipName: app.zip
+  imageName: blazorcrud
+  tag: latest
 
 stages:
   # =========================
-  # BUILD STAGE
+  # BUILD & PUSH IMAGE
   # =========================
-  - stage: Build
+  - stage: BuildAndPush
     jobs:
-      - job: BuildJob
+      - job: DockerBuild
         pool:
           name: Default
 
         steps:
-          - task: UseDotNet@2
+          - task: Docker@2
             inputs:
-              packageType: sdk
-              version: 8.0.x
-
-          # Restore
-          - script: dotnet restore BlazorCRUD/BlazorCRUD.csproj
-            displayName: Restore
-
-          # Build
-          - script: dotnet build BlazorCRUD/BlazorCRUD.csproj --configuration $(buildConfiguration) --no-restore
-            displayName: Build
-
-          # Publish
-          - script: dotnet publish BlazorCRUD/BlazorCRUD.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish
-            displayName: Publish
-
-          # Zip published output
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/publish
-              includeRootFolder: false
-              archiveType: zip
-              archiveFile: $(Build.ArtifactStagingDirectory)/$(zipName)
-              replaceExistingArchive: true
-
-          # Publish ZIP as artifact
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: $(Build.ArtifactStagingDirectory)/$(zipName)
-              ArtifactName: $(artifactName)
+              command: buildAndPush
+              repository: $(imageName)
+              dockerfile: Dockerfile
+              containerRegistry: acr-LearnAppService
+              tags: |
+                $(tag)
 
   # =========================
-  # DEPLOY STAGE
+  # DEPLOY CONTAINER
   # =========================
   - stage: Deploy
-    dependsOn: Build
+    dependsOn: BuildAndPush
     jobs:
       - job: DeployJob
         pool:
           name: Default
 
         steps:
-          # Download artifact
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              artifactName: $(artifactName)
-              downloadPath: $(System.ArtifactsDirectory)
-
-          # Deploy ZIP
-          - task: AzureWebApp@1
+          - task: AzureWebAppContainer@1
             inputs:
               azureSubscription: learnappservice
               appName: LearnAppService
-              package: $(System.ArtifactsDirectory)/$(artifactName)/$(zipName)
+              containers: blazoracr.azurecr.io/$(imageName):$(tag)
