@@ -38,6 +38,6 @@ stages:
         steps:
           - task: AzureWebAppContainer@1
             inputs:
-              azureSubscription: learnappservice
+              azureSubscription: scn-LearnAppService
               appName: LearnAppService
               containers: blazoracr.azurecr.io/$(imageName):$(tag)
