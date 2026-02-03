@@ -24,6 +24,7 @@ stages:
               containerRegistry: ghcr-github-LearnAppService
               tags: |
                 $(tag)
+              arguments: --platform linux/amd64
 
   # =========================
   # DEPLOY CONTAINER
