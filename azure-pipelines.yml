@@ -16,15 +16,18 @@ stages:
           name: Default
 
         steps:
-          - task: Docker@2
-            inputs:
-              command: buildAndPush
-              repository: ghcr.io/paawanx/$(imageName)
-              dockerfile: dockerfile
-              containerRegistry: ghcr-github-LearnAppService
-              tags: |
-                $(tag)
-              arguments: --platform linux/amd64
+          - script: |
+              docker buildx create --use --name mybuilder || true
+              docker buildx inspect --bootstrap
+
+              docker login ghcr.io -u $(GHCR_USERNAME) -p $(GHCR_PAT)
+
+              docker buildx build \
+                --platform linux/amd64 \
+                -t ghcr.io/$(GHCR_USERNAME)/blazorcrud:latest \
+                --push .
+            displayName: Build and Push AMD64 Image
+
 
   # =========================
   # DEPLOY CONTAINER
