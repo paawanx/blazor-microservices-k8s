@@ -19,9 +19,9 @@ stages:
           - task: Docker@2
             inputs:
               command: buildAndPush
-              repository: $(imageName)
+              repository: ghcr.io/paawanx/$(imageName)
               dockerfile: dockerfile
-              containerRegistry: acr-LearnAppService
+              containerRegistry: ghcr-github-LearnAppService
               tags: |
                 $(tag)
 
@@ -40,4 +40,4 @@ stages:
             inputs:
               azureSubscription: scn-LearnAppService
               appName: LearnAppService
-              containers: blazoracr.azurecr.io/$(imageName):$(tag)
+              containers: ghcr.io/paawanx/$(imageName):$(tag)
