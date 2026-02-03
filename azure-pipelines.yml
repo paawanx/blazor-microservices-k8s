@@ -13,7 +13,7 @@ stages:
     jobs:
       - job: DockerBuild
         pool:
-          vmImage: ubuntu-latest
+          name: Default
 
         steps:
           - task: Docker@2
@@ -33,7 +33,7 @@ stages:
     jobs:
       - job: DeployJob
         pool:
-          vmImage: ubuntu-latest
+          name: Default
 
         steps:
           - task: AzureWebAppContainer@1
