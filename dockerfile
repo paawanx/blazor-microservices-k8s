@@ -1,11 +1,24 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
+# ---------- BUILD STAGE ----------
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY . .
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app/publish
 
-# Runtime stage
+# Copy solution and csproj files first
+COPY *.sln ./
+COPY BlazorCRUD/*.csproj BlazorCRUD/
+COPY BlazorCRUD.Client/*.csproj BlazorCRUD.Client/
+
+# Restore (cached layer)
+RUN dotnet restore
+
+# Copy everything else
+COPY . .
+
+# Publish
+RUN dotnet publish \
+    -c Release \
+    -o /app/publish
+
+# ---------- RUNTIME STAGE ----------
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .

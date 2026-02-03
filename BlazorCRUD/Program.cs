@@ -15,10 +15,8 @@ builder.Services.AddRazorComponents()
 // Register StudentService
 builder.Services.AddScoped<IStudentService, StudentService>();
 
-var folder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-Directory.CreateDirectory(folder);
-
-var dbPath = Path.Combine(folder, "app.db");
+// setup database
+var dbPath = Path.Combine(AppContext.BaseDirectory, "app.db");
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
