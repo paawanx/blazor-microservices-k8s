@@ -1,8 +1,6 @@
-using BlazorCRUD.AuthApi.Data;
+using BlazorCRUD.AuthApi.Interfaces;
 using BlazorCRUD.AuthApi.Models;
-using BlazorCRUD.AuthApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BlazorCRUD.AuthApi.Controllers;
 
@@ -10,34 +8,29 @@ namespace BlazorCRUD.AuthApi.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthDbContext _db;
+    private readonly IAuthService _authService;
 
-    public AuthController(AuthDbContext db)
+    public AuthController(IAuthService authService)
     {
-        _db = db;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(User user)
     {
-        user.PasswordHash = PasswordHasher.Hash(user.PasswordHash);
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync();
+        await _authService.Register(user.Email, user.PasswordHash);
         return Ok();
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(User user)
     {
-        var hash = PasswordHasher.Hash(user.PasswordHash);
+        var token = await _authService.Login(user.Email, user.PasswordHash);
+        if (token != null)
+        {
+            return Ok(new { token });
+        }
 
-        var existing = await _db.Users
-            .FirstOrDefaultAsync(x => x.Email == user.Email &&
-                                      x.PasswordHash == hash);
-
-        if (existing == null)
-            return Unauthorized();
-
-        return Ok("LOGGED_IN");
+        return Unauthorized();
     }
 }
