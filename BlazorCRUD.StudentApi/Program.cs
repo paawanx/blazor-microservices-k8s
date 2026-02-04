@@ -1,11 +1,6 @@
-using System.Text;
-using BlazorCRUD.AuthApi.Data;
-using BlazorCRUD.AuthApi.Models;
-using BlazorCRUD.AuthApi.Services;
-using BlazorCRUD.AuthApi.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +12,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Auth API",
+        Title = "Student API",
         Version = "v1"
     });
 
@@ -47,26 +42,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
-// setup database
-var dbPath = Path.Combine(AppContext.BaseDirectory, "appAuth.db");
-
-builder.Services.AddDbContextFactory<AuthDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
-
 builder.Services.AddControllers();
 
-// Configure JWT settings - fetch once and reuse
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
-builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtSettings));
-
-// Register Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
+builder.Services.AddAuthentication("Bearer")
+.AddJwtBearer("Bearer", options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -75,23 +54,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = jwtSettings.Issuer,
-        ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings.Key)
-        )
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey =
+            new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    builder.Configuration["Jwt:Key"]!
+                )
+            )
     };
 });
 
 builder.Services.AddAuthorization();
 
-var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    db.Database.Migrate();
-}
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -101,7 +78,6 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

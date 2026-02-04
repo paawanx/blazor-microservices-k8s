@@ -1,6 +1,0 @@
-@BlazorCRUD.AuthApi_HostAddress = http://localhost:5258
-
-GET {{BlazorCRUD.AuthApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
