@@ -53,13 +53,20 @@ else
     [SupplyParameterFromForm]
     private Student? Student { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Student ??= await StudentService.GetStudentByIdAsync(Id);
-
-        if (Student is null)
+        if (firstRender)
         {
-            NavigationManager.NavigateTo("notfound");
+            Student ??= await StudentService.GetStudentByIdAsync(Id);
+
+            if (Student is null)
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                StateHasChanged();
+            }
         }
     }
 

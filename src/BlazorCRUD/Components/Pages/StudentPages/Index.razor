@@ -31,9 +31,15 @@ else
 
 @code {
     private IEnumerable<Student>? students;
+    private bool hasRendered = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        students = await StudentService.GetAllStudentsAsync();
+        if (firstRender)
+        {
+            students = await StudentService.GetAllStudentsAsync();
+            hasRendered = true;
+            StateHasChanged();
+        }
     }
 }
