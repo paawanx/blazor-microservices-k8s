@@ -1,0 +1,39 @@
+@page "/students"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject IStudentService StudentService
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="students/create">Create New</a>
+</p>
+
+@if (students == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <QuickGrid Class="table" Items="students.AsQueryable()">
+        <PropertyColumn Property="student => student.Name" />
+        <PropertyColumn Property="student => student.Age" />
+        <PropertyColumn Property="student => student.BirthDate" Format="MM/dd/yyyy" />
+
+        <TemplateColumn Context="student">
+            <a href="@($"students/edit?id={student.Id}")">Edit</a> |
+            <a href="@($"students/details?id={student.Id}")">Details</a> |
+            <a href="@($"students/delete?id={student.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    private IEnumerable<Student>? students;
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await StudentService.GetAllStudentsAsync();
+    }
+}

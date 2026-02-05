@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD", "BlazorCRUD\BlazorCRUD.csproj", "{DF365D83-5DD5-4647-965B-5D3A4221CAC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD", "src\BlazorCRUD\BlazorCRUD.csproj", "{DF365D83-5DD5-4647-965B-5D3A4221CAC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD.AuthApi", "BlazorCRUD.AuthApi\BlazorCRUD.AuthApi.csproj", "{A95B8BAE-A9F9-4F37-B760-95850CFB5820}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD.AuthApi", "src\BlazorCRUD.AuthApi\BlazorCRUD.AuthApi.csproj", "{A95B8BAE-A9F9-4F37-B760-95850CFB5820}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD.StudentApi", "BlazorCRUD.StudentApi\BlazorCRUD.StudentApi.csproj", "{32563C70-CF36-4FF8-8718-4303BFE83A79}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD.StudentApi", "src\BlazorCRUD.StudentApi\BlazorCRUD.StudentApi.csproj", "{32563C70-CF36-4FF8-8718-4303BFE83A79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD.ApiGateway", "BlazorCRUD.ApiGateway\BlazorCRUD.ApiGateway.csproj", "{9C4A87A0-D39A-41FF-85ED-6C790D125315}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCRUD.ApiGateway", "src\BlazorCRUD.ApiGateway\BlazorCRUD.ApiGateway.csproj", "{9C4A87A0-D39A-41FF-85ED-6C790D125315}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -26,6 +26,7 @@ stages:
                 --platform linux/amd64 \
                 -t ghcr.io/$(GHCR_USERNAME)/blazorcrud:latest \
                 -t ghcr.io/$(GHCR_USERNAME)/blazorcrud:$(Build.BuildId) \
+                -f docker/blazorcrud/Dockerfile \
                 --push .
             displayName: Build and Push AMD64 Image
 
