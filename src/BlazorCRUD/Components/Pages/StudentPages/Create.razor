@@ -1,4 +1,6 @@
 @page "/students/create"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @inject IStudentService StudentService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer

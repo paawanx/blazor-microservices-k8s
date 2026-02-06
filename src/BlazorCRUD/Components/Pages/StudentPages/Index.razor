@@ -1,4 +1,6 @@
 @page "/students"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @rendermode InteractiveServer
 @inject IStudentService StudentService
 
@@ -31,14 +33,12 @@ else
 
 @code {
     private IEnumerable<Student>? students;
-    private bool hasRendered = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             students = await StudentService.GetAllStudentsAsync();
-            hasRendered = true;
             StateHasChanged();
         }
     }

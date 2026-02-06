@@ -1,10 +1,9 @@
 using BlazorCRUD.Components;
-using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 using BlazorCRUD.Interfaces;
 using BlazorCRUD.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +12,16 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddQuickGridEntityFrameworkAdapter();
+// Add authentication and authorization
+builder.Services.AddAuthentication("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+    });
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddAuthorization();
 
 builder.Services.AddHttpClient("Gateway", client =>
 {
@@ -24,7 +32,7 @@ builder.Services.AddScoped<ProtectedLocalStorage>();
 
 builder.Services.AddScoped<IAuthService, AuthApiService>();
 builder.Services.AddScoped<IStudentService, StudentApiService>();
-builder.Services.AddScoped<AuthTokenStore>();
+builder.Services.AddScoped<IAuthTokenStore, AuthTokenStore>();
 
 var app = builder.Build();
 
@@ -40,6 +48,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

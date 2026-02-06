@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using BlazorCRUD.Interfaces;
 
 namespace BlazorCRUD.Services;
 
-public class AuthTokenStore
+public class AuthTokenStore : IAuthTokenStore
 {
     private readonly ProtectedLocalStorage _localStorage;
     private const string key = "jwt";

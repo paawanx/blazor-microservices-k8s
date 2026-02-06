@@ -2,10 +2,12 @@
 @using BlazorCRUD.Services
 @using BlazorCRUD.Models
 @using BlazorCRUD.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject IAuthService AuthApi
-@inject AuthTokenStore AuthTokenStore
+@inject IAuthTokenStore AuthTokenStore
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login</PageTitle>
 
@@ -105,6 +107,10 @@
             }
             
             await AuthTokenStore.SetToken(token!);
+            
+            // Notify Blazor that the authentication state has changed
+            ((CustomAuthStateProvider)AuthStateProvider).NotifyAuthenticationStateChanged();
+            
             NavigationManager.NavigateTo("/");
         }
         catch (Exception ex)

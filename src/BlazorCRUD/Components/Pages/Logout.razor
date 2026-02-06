@@ -1,0 +1,19 @@
+@page "/logout"
+@using Microsoft.AspNetCore.Components.Authorization
+@using BlazorCRUD.Interfaces
+@using BlazorCRUD.Services
+@inject IAuthTokenStore AuthTokenStore
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await AuthTokenStore.ClearToken();
+            ((CustomAuthStateProvider)AuthStateProvider).NotifyAuthenticationStateChanged();
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}

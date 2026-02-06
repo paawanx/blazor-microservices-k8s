@@ -7,10 +7,10 @@ namespace BlazorCRUD.Services;
 public class StudentApiService : IStudentService
 {
     private readonly HttpClient _httpClient;
-    private readonly AuthTokenStore _tokenStore;
+    private readonly IAuthTokenStore _tokenStore;
     private const string baseUrl = "students/api/students";
 
-    public StudentApiService(IHttpClientFactory httpClientFactory, AuthTokenStore tokenStore)
+    public StudentApiService(IHttpClientFactory httpClientFactory, IAuthTokenStore tokenStore)
     {
         _httpClient = httpClientFactory.CreateClient("Gateway");
         _tokenStore = tokenStore;
