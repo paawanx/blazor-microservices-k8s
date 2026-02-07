@@ -25,7 +25,14 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddHttpClient("Gateway", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiGateway:BaseUrl"]!);
+    var gatewayUrl = Environment.GetEnvironmentVariable("GATEWAY_BASE_URL") ?? builder.Configuration["ApiGateway:BaseUrl"];
+    
+    if (string.IsNullOrEmpty(gatewayUrl))
+    {
+        throw new InvalidOperationException("API Gateway base URL is not configured. Please set the GATEWAY_BASE_URL environment variable or add it to appsettings.json.");
+    }
+    
+    client.BaseAddress = new Uri(gatewayUrl!);
 });
 
 builder.Services.AddScoped<ProtectedLocalStorage>();

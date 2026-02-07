@@ -1,25 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: blazorcrud-auth-api
+  name: blazorcrud-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: blazorcrud-auth-api
+      app: blazorcrud-ui
   template:
     metadata:
       labels:
-        app: blazorcrud-auth-api
+        app: blazorcrud-ui
     spec:
       imagePullSecrets:
         - name: ghcr-secret
       containers:
-        - name: blazorcrud-auth-api
-          image: ghcr.io/paawanx/blazorcrud.auth-api:1
+        - name: blazorcrud-ui
+          image: ghcr.io/paawanx/blazorcrud.ui:2
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Development
+            - name: GATEWAY_BASE_URL
+              value: "http://blazorcrud-gateway"
