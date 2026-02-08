@@ -18,7 +18,7 @@ public class AuthApiService : IAuthService
         try
         {
             var response = await _httpClient.PostAsJsonAsync(
-                "auth/api/auth/login",
+                "api/auth/login",
                 new { username, password });
 
             if (!response.IsSuccessStatusCode)
@@ -38,7 +38,7 @@ public class AuthApiService : IAuthService
 
     public async Task Register(string email, string password)
     {
-        var response = await _httpClient.PostAsJsonAsync("/api/auth/register", new { email, password });
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new { email, password });
         response.EnsureSuccessStatusCode();
     }
 }

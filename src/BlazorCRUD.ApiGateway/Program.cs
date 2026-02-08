@@ -4,6 +4,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add YARP config from file with hot-reload support
+var yarpConfigPath = "/app/yarp/yarp-config.json";
+if (File.Exists(yarpConfigPath))
+{
+    builder.Configuration.AddJsonFile(yarpConfigPath, optional: false, reloadOnChange: true);
+}
+
 builder.Services.AddAuthentication("Bearer")
 .AddJwtBearer("Bearer", options =>
 {

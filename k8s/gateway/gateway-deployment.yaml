@@ -16,10 +16,17 @@ spec:
         - name: ghcr-secret
       containers:
         - name: blazorcrud-gateway
-          image: ghcr.io/paawanx/blazorcrud.gateway:2
+          image: ghcr.io/paawanx/blazorcrud.gateway:3
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Development
+          volumeMounts:
+            - name: yarp-config-volume
+              mountPath: /app/yarp
+      volumes:
+        - name: yarp-config-volume
+          configMap:
+            name: yarp-config

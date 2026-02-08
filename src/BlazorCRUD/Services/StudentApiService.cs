@@ -8,7 +8,7 @@ public class StudentApiService : IStudentService
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthTokenStore _tokenStore;
-    private const string baseUrl = "students/api/students";
+    private const string baseUrl = "api/students";
 
     public StudentApiService(IHttpClientFactory httpClientFactory, IAuthTokenStore tokenStore)
     {

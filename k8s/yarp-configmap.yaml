@@ -1,0 +1,40 @@
+apiVersion: v1
+data:
+  yarp-config.json: |
+    {
+      "ReverseProxy": {
+        "Routes": {
+          "authRoute": {
+            "ClusterId": "authCluster",
+            "Match": {
+              "Path": "/api/auth/{**catch-all}"
+            }
+          },
+          "studentRoute": {
+            "ClusterId": "studentCluster",
+            "Match": {
+              "Path": "/api/students/{**catch-all}"
+            }
+          }
+        },
+        "Clusters": {
+          "authCluster": {
+            "Destinations": {
+              "d1": {
+                "Address": "http://blazorcrud-auth-api"
+              }
+            }
+          },
+          "studentCluster": {
+            "Destinations": {
+              "d1": {
+                "Address": "http://blazorcrud-student-api"
+              }
+            }
+          }
+        }
+      }
+    }
+kind: ConfigMap
+metadata:
+  name: yarp-config
