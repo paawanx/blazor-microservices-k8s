@@ -94,6 +94,17 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     db.Database.Migrate();
+
+    // Seed default test user if no users exist
+    if (!db.Users.Any())
+    {
+        db.Users.Add(new User
+        {
+            Email = "test@test.com",
+            PasswordHash = PasswordHasher.Hash("test")
+        });
+        db.SaveChanges();
+    }
 }
 
 // Configure the HTTP request pipeline.
