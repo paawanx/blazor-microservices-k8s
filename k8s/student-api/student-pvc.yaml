@@ -1,0 +1,12 @@
+# PersistentVolumeClaim for Student API SQLite database
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: student-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

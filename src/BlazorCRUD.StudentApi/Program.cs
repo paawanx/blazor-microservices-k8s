@@ -75,7 +75,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IStudentService, StudentService>();
 
 // setup database
-var dbPath = Path.Combine(AppContext.BaseDirectory, "appStudent.db");
+// In K8s: DB_PATH env var points to the mounted volume (/data/appStudent.db)
+// Locally: Falls back to the app directory
+var dbPath = Environment.GetEnvironmentVariable("DB_PATH")
+    ?? Path.Combine(AppContext.BaseDirectory, "appStudent.db");
 
 builder.Services.AddDbContextFactory<StudentDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));

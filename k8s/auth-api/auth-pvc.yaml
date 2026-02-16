@@ -1,0 +1,15 @@
+# PersistentVolumeClaim - Requests storage from Kubernetes
+# Think of it as saying: "I need 500Mi of disk space for my SQLite database"
+# Kubernetes will automatically allocate a PersistentVolume (actual disk) to fulfill this request
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-db-pvc           # Name to reference in the deployment
+spec:
+  accessModes:
+    - ReadWriteOnce            # Only one pod can read/write at a time (perfect for SQLite)
+  resources:
+    requests:
+      storage: 500Mi           # How much space you need
+  # storageClassName is omitted — uses the default provisioner (hostpath on Docker Desktop)

@@ -16,10 +16,19 @@ spec:
         - name: ghcr-secret
       containers:
         - name: blazorcrud-student-api
-          image: ghcr.io/paawanx/blazorcrud.student-api:1
+          image: ghcr.io/paawanx/blazorcrud.student-api:2
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Development
+            - name: DB_PATH
+              value: /data/appStudent.db
+          volumeMounts:
+            - name: student-db-storage
+              mountPath: /data
+      volumes:
+        - name: student-db-storage
+          persistentVolumeClaim:
+            claimName: student-db-pvc

@@ -49,7 +49,10 @@ builder.Services.AddSwaggerGen(c =>
 
 
 // setup database
-var dbPath = Path.Combine(AppContext.BaseDirectory, "appAuth.db");
+// In K8s: DB_PATH env var points to the mounted volume (/data/appAuth.db)
+// Locally: Falls back to the app directory
+var dbPath = Environment.GetEnvironmentVariable("DB_PATH")
+    ?? Path.Combine(AppContext.BaseDirectory, "appAuth.db");
 
 builder.Services.AddDbContextFactory<AuthDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));

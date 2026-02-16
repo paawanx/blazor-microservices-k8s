@@ -16,10 +16,19 @@ spec:
         - name: ghcr-secret
       containers:
         - name: blazorcrud-auth-api
-          image: ghcr.io/paawanx/blazorcrud.auth-api:1
+          image: ghcr.io/paawanx/blazorcrud.auth-api:2
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Development
+            - name: DB_PATH              # Tell the app where to store the .db file
+              value: /data/appAuth.db
+          volumeMounts:                  # Mount the PVC into the container
+            - name: auth-db-storage      # Must match the volume name below
+              mountPath: /data           # Folder inside container where PVC is mounted
+      volumes:                           # Define what storage is available
+        - name: auth-db-storage          # Name referenced by volumeMounts above
+          persistentVolumeClaim:
+            claimName: auth-db-pvc       # Must match the PVC metadata.name
